@@ -1,23 +1,5 @@
 const mongoose = require("mongoose");
 
-const availabilitySlotSchema = new mongoose.Schema({
-  day: {
-    type: String,
-    enum: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-    required: true
-  },
-  startTime: {
-    type: String,
-    required: true,
-    match: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/
-  },
-  endTime: {
-    type: String,
-    required: true,
-    match: /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/
-  }
-});
-
 const doctorSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -59,7 +41,11 @@ const doctorSchema = new mongoose.Schema({
     ref: "Hospital",
     required: [true, "Hospital association is required"]
   },
-  availability: [availabilitySlotSchema],
+  availability: [{
+    day: String,
+    startTime: String,
+    endTime: String
+  }],
   status: {
     type: String,
     enum: ['active', 'on-leave', 'not-practicing'],
@@ -82,7 +68,6 @@ const doctorSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Indexes
 doctorSchema.index({ specialization: 1 });
 doctorSchema.index({ associatedHospital: 1 });
 doctorSchema.index({ status: 1 });
