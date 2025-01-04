@@ -30,10 +30,10 @@ const pharmacistSchema = new mongoose.Schema({
     trim: true,
     match: /^\S+@\S+\.\S+$/,
   },
-  associatedPharmacy: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Hospital",
+ associatedPharmacy: {
+    type: String,
     required: true,
+    trim: true,
   },
   status: {
     type: String,
