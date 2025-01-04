@@ -64,4 +64,5 @@ patientSchema.methods.comparePassword = async function(candidatePassword) {
     throw new Error('Error comparing passwords');
   }
 };
-module.exports =mongoose.model('Patient',patientSchema);
+const Patient = mongoose.model("Patient",patientSchema);
+module.exports=Patient;
