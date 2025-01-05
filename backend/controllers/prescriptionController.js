@@ -1,47 +1,56 @@
-const Prescription = require('../models/prescription.js');
+const Prescription = require('../models/prescription');
 
 exports.createPrescription = async (req, res) => {
+  const { hospitalName, patientName, patientAge, symptoms, diagnosis, medicines } = req.body;
+
   try {
-    const prescription = new Prescription({
-      ...req.body,
-      prescriptionId: generateUniqueCode()
+    const newPrescription = await Prescription.create({
+      hospitalName,
+      patientName,
+      patientAge,
+      symptoms,
+      diagnosis,
+      medicines
     });
-    await prescription.save();
-    res.status(201).json(prescription);
+
+    res.status(201).json({ message: 'Prescription created successfully', prescription: newPrescription });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    res.status(500).json({ message: 'Error creating prescription', error: error.message });
   }
 };
 
-exports.getPrescriptions = async (req, res) => {
+exports.viewPrescription = async (req, res) => {
+  const { id } = req.params;
+
   try {
-    const { page = 1, limit = 10 } = req.query;
-    const prescriptions = await Prescription
-      .find()
-      .limit(limit)
-      .skip((page - 1) * limit)
-      .sort({ dateCreated: -1 });
-    res.json(prescriptions);
+    const prescription = await Prescription.findOne({ prescriptionId: id });
+
+    if (!prescription) {
+      return res.status(404).json({ message: 'Prescription not found' });
+    }
+
+    res.status(200).json({ prescription });
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(500).json({ message: 'Error fetching prescription', error: error.message });
   }
 };
 
 exports.updatePrescription = async (req, res) => {
-  try {
-    const prescription = await Prescription.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-    res.json(prescription);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-};
+  const { id } = req.params;
+  const { medicines } = req.body;
 
-const generateUniqueCode = () => {
-  const timestamp = Date.now().toString(36);
-  const randomStr = Math.random().toString(36).substring(2, 5);
-  return (timestamp + randomStr).toUpperCase().slice(-8);
+  try {
+    const prescription = await Prescription.findOne({ prescriptionId: id });
+
+    if (!prescription) {
+      return res.status(404).json({ message: 'Prescription not found' });
+    }
+
+    prescription.medicines = medicines;
+    await prescription.save();
+
+    res.status(200).json({ message: 'Prescription updated successfully', prescription });
+  } catch (error) {
+    res.status(500).json({ message: 'Error updating prescription', error: error.message });
+  }
 };
