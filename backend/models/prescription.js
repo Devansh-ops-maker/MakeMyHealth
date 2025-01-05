@@ -3,8 +3,8 @@ const mongoose = require('mongoose');
 const prescriptionSchema = new mongoose.Schema({
   prescriptionId: {
     type: String,
-    required: true,
-    unique: true
+    unique: true,
+    default: () => Math.random().toString(36).substring(2, 8).toUpperCase()
   },
   hospitalName: {
     type: String,
@@ -33,12 +33,7 @@ const prescriptionSchema = new mongoose.Schema({
     dosage: {
       type: String,
       required: true
-    },
-    dispensed: {
-      type: Boolean,
-      default: false
-    },
-    dispensedTime: Date
+    }
   }],
   dateCreated: {
     type: Date,
@@ -46,12 +41,8 @@ const prescriptionSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['active', 'expired', 'fulfilled'],
+    enum: ['active', 'expired', 'fulfilled','partially fulfilled'],
     default: 'active'
-  },
-  expiryDate: {
-    type: Date,
-    required: true
   }
 });
 
