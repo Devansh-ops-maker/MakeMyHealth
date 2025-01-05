@@ -15,11 +15,6 @@ export const protect = async (req, res, next) => {
     if (!user) {
       return res.status(401).json({ message: 'User no longer exists' });
     }
-
-    if (user.isLocked) {
-      return res.status(423).json({ message: 'Account is locked' });
-    }
-
     req.user = user;
     next();
   } catch (error) {
