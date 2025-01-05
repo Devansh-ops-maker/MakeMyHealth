@@ -1,31 +1,54 @@
-import jwt from 'jsonwebtoken';
-import User from '../models/user.js';
-import { promisify } from 'util';
+const jwt = require('jsonwebtoken');
+const { Doctor, Patient, Pharmacist } = require('../models');
 
-export const protect = async (req, res, next) => {
+
+exports.protect = async (req, res, next) => {
   try {
+
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
-      return res.status(401).json({ message: 'Please login to access this resource' });
+      return res.status(401).json({
+        status: 'fail',
+        message: 'You are not logged in. Please log in to access this resource.',
+      });
     }
 
-    const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-    
-    const user = await User.findById(decoded.id);
-    if (!user) {
-      return res.status(401).json({ message: 'User no longer exists' });
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    let user;
+    if (decoded.role === 'doctor') {
+      user = await Doctor.findById(decoded.id);
+    } else if (decoded.role === 'patient') {
+      user = await Patient.findById(decoded.id);
+    } else if (decoded.role === 'pharmacist') {
+      user = await Pharmacist.findById(decoded.id);
     }
+
+    if (!user) {
+      return res.status(401).json({
+        status: 'fail',
+        message: 'The user belonging to this token no longer exists.',
+      });
+    }
+
     req.user = user;
+    req.userRole = decoded.role; 
     next();
-  } catch (error) {
-    res.status(401).json({ message: 'Invalid token. Please login again' });
+  } catch (err) {
+    res.status(401).json({
+      status: 'fail',
+      message: 'Invalid or expired token. Please log in again.',
+    });
   }
 };
 
-export const restrictTo = (...roles) => {
+exports.restrictTo = (...roles) => {
   return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({ message: 'Permission denied' });
+    if (!roles.includes(req.userRole)) {
+      return res.status(403).json({
+        status: 'fail',
+        message: 'You do not have permission to perform this action.',
+      });
     }
     next();
   };
