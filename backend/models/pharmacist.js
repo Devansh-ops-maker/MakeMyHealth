@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
 const pharmacistSchema = new mongoose.Schema({
     name: {
@@ -80,4 +80,4 @@ pharmacistSchema.methods.comparePassword = async function(candidatePassword) {
 
 const Pharmacist = mongoose.model("Pharmacist", pharmacistSchema);
 
-module.exports = Pharmacist;
+export default Pharmacist;
