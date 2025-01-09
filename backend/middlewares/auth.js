@@ -1,10 +1,11 @@
-const jwt = require('jsonwebtoken');
-const { Doctor, Patient, Pharmacist } = require('../models');
+import jwt from "jsonwebtoken";
+import * as Doctor from '../models/doctor.js';
+import * as Patient from '../models/patient.js';
+import * as Pharmacist from '../models/Pharmacist.js';
+import * as Prescription from '../models/prescription.js';
 
-
-exports.protect = async (req, res, next) => {
+export const protect = async (req, res, next) => {
   try {
-
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) {
       return res.status(401).json({
@@ -32,7 +33,7 @@ exports.protect = async (req, res, next) => {
     }
 
     req.user = user;
-    req.userRole = decoded.role; 
+    req.userRole = decoded.role;
     next();
   } catch (err) {
     res.status(401).json({
@@ -42,7 +43,7 @@ exports.protect = async (req, res, next) => {
   }
 };
 
-exports.restrictTo = (...roles) => {
+export const restrictTo = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.userRole)) {
       return res.status(403).json({
