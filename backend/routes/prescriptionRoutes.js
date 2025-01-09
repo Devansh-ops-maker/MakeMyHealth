@@ -1,23 +1,27 @@
-const express = require('express');
-const { protect, restrictTo } = require('../middlewares/auth');
-const prescriptionController = require('../controllers/prescriptionController');
+import express from 'express';
+import { protect, restrictTo } from '../middlewares/auth.js';
+import prescriptionController from '../controllers/prescriptionController.js';
 
-const Prescriptionrouter = express.Router();
+const router = express.Router();
 
-Prescriptionrouter.use(protect);
-router.post('/', 
+router.use(protect);
+
+router.post(
+  '/',
   restrictTo('doctor'),
   prescriptionController.createPrescription
 );
 
-Prescriptionrouter.get('/:id',
+router.get(
+  '/:id',
   restrictTo('patient'),
   prescriptionController.viewPrescription
 );
 
-Prescriptionrouter.patch('/:id',
+router.patch(
+  '/:id',
   restrictTo('pharmacist'),
   prescriptionController.updatePrescription
 );
 
-module.exports = Prescriptionrouter;
+export default router;
