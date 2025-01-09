@@ -1,6 +1,6 @@
-const Prescription = require('../models/prescription');
+import Prescription from '../models/prescription.js';
 
-exports.createPrescription = async (req, res) => {
+const createPrescription = async (req, res) => {
   const { hospitalName, patientName, patientAge, symptoms, diagnosis, medicines } = req.body;
 
   try {
@@ -10,32 +10,43 @@ exports.createPrescription = async (req, res) => {
       patientAge,
       symptoms,
       diagnosis,
-      medicines
+      medicines,
     });
 
-    res.status(201).json({ message: 'Prescription created successfully', prescription: newPrescription });
+    res.status(201).json({
+      message: 'Prescription created successfully',
+      prescription: newPrescription,
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Error creating prescription', error: error.message });
+    res.status(500).json({
+      message: 'Error creating prescription',
+      error: error.message,
+    });
   }
 };
 
-exports.viewPrescription = async (req, res) => {
+const viewPrescription = async (req, res) => {
   const { id } = req.params;
 
   try {
     const prescription = await Prescription.findOne({ prescriptionId: id });
 
     if (!prescription) {
-      return res.status(404).json({ message: 'Prescription not found' });
+      return res.status(404).json({
+        message: 'Prescription not found',
+      });
     }
 
     res.status(200).json({ prescription });
   } catch (error) {
-    res.status(500).json({ message: 'Error fetching prescription', error: error.message });
+    res.status(500).json({
+      message: 'Error fetching prescription',
+      error: error.message,
+    });
   }
 };
 
-exports.updatePrescription = async (req, res) => {
+const updatePrescription = async (req, res) => {
   const { id } = req.params;
   const { medicines } = req.body;
 
@@ -43,14 +54,24 @@ exports.updatePrescription = async (req, res) => {
     const prescription = await Prescription.findOne({ prescriptionId: id });
 
     if (!prescription) {
-      return res.status(404).json({ message: 'Prescription not found' });
+      return res.status(404).json({
+        message: 'Prescription not found',
+      });
     }
 
     prescription.medicines = medicines;
     await prescription.save();
 
-    res.status(200).json({ message: 'Prescription updated successfully', prescription });
+    res.status(200).json({
+      message: 'Prescription updated successfully',
+      prescription,
+    });
   } catch (error) {
-    res.status(500).json({ message: 'Error updating prescription', error: error.message });
+    res.status(500).json({
+      message: 'Error updating prescription',
+      error: error.message,
+    });
   }
 };
+
+export default { createPrescription, viewPrescription, updatePrescription };
