@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const bcrypt = require("bcrypt");
+import mongoose from "mongoose";
+import bcrypt from "bcrypt";
 
 const patientSchema = new mongoose.Schema({
   name: {
@@ -57,6 +57,7 @@ patientSchema.pre('save', async function(next) {
   this.password = await bcrypt.hash(this.password, 12);
   next();
 });
+
 patientSchema.methods.comparePassword = async function(candidatePassword) {
   try {
     return await bcrypt.compare(candidatePassword, this.password);
@@ -64,5 +65,7 @@ patientSchema.methods.comparePassword = async function(candidatePassword) {
     throw new Error('Error comparing passwords');
   }
 };
-const Patient = mongoose.model("Patient",patientSchema);
-module.exports=Patient;
+
+const Patient = mongoose.model("Patient", patientSchema);
+
+export default Patient;
