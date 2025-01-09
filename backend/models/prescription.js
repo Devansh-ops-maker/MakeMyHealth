@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const prescriptionSchema = new mongoose.Schema({
   prescriptionId: {
@@ -41,9 +41,9 @@ const prescriptionSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['active', 'expired', 'fulfilled','partially fulfilled'],
+    enum: ['active', 'expired', 'fulfilled', 'partially fulfilled'],
     default: 'active'
   }
 });
 
-module.exports = mongoose.model('Prescription', prescriptionSchema);
+export default mongoose.model('Prescription', prescriptionSchema);
