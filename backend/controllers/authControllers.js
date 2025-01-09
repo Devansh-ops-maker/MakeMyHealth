@@ -1,13 +1,16 @@
-const jwt = require('jsonwebtoken');
-const { Doctor, Patient, Pharmacist } = require('../models');
+import jwt from 'jsonwebtoken';
+import  Doctor from '../models/doctor.js';
+import  Patient from '../models/patient.js';
+import  Pharmacist from '../models/Pharmacist.js';
+import  Prescription from '../models/prescription.js';
 
 const signToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRES_IN
+    expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
 
-exports.registerDoctor = async (req, res) => {
+export const registerDoctor = async (req, res) => {
   try {
     const newDoctor = await Doctor.create({
       name: req.body.name,
@@ -19,11 +22,11 @@ exports.registerDoctor = async (req, res) => {
       experience: req.body.experience,
       qualification: req.body.qualification,
       associatedHospital: req.body.associatedHospital,
-      statues: req.body.status,
+      status: req.body.status,
       availability: req.body.availability,
       languages: req.body.languages,
       consultationFee: req.body.consultationFee,
-      createdAt: req.ody.createdAt
+      createdAt: req.body.createdAt,
     });
 
     const token = signToken(newDoctor._id);
@@ -32,18 +35,18 @@ exports.registerDoctor = async (req, res) => {
       status: 'success',
       token,
       data: {
-        doctor: newDoctor
-      }
+        doctor: newDoctor,
+      },
     });
   } catch (err) {
     res.status(400).json({
       status: 'fail',
-      message: err.message
+      message: err.message,
     });
   }
 };
 
-exports.registerPatient = async (req, res) => {
+export const registerPatient = async (req, res) => {
   try {
     const newPatient = await Patient.create({
       name: req.body.name,
@@ -55,7 +58,7 @@ exports.registerPatient = async (req, res) => {
       allergies: req.body.allergies,
       medicalHistory: req.body.medicalHistory,
       isActive: req.body.isActive,
-      emergencyContact: req.body.emergencyContact
+      emergencyContact: req.body.emergencyContact,
     });
 
     const token = signToken(newPatient._id);
@@ -64,18 +67,18 @@ exports.registerPatient = async (req, res) => {
       status: 'success',
       token,
       data: {
-        patient: newPatient
-      }
+        patient: newPatient,
+      },
     });
   } catch (err) {
     res.status(400).json({
       status: 'fail',
-      message: err.message
+      message: err.message,
     });
   }
 };
 
-exports.registerPharmacist = async (req, res) => {
+export const registerPharmacist = async (req, res) => {
   try {
     const newPharmacist = await Pharmacist.create({
       name: req.body.name,
@@ -86,7 +89,7 @@ exports.registerPharmacist = async (req, res) => {
       contactNumber: req.body.contactNumber,
       qualifications: req.body.qualifications,
       status: req.body.status,
-      createdAt: req.body.createdAt
+      createdAt: req.body.createdAt,
     });
 
     const token = signToken(newPharmacist._id);
@@ -95,25 +98,25 @@ exports.registerPharmacist = async (req, res) => {
       status: 'success',
       token,
       data: {
-        pharmacist: newPharmacist
-      }
+        pharmacist: newPharmacist,
+      },
     });
   } catch (err) {
     res.status(400).json({
       status: 'fail',
-      message: err.message
+      message: err.message,
     });
   }
 };
 
-exports.login = async (req, res) => {
+export const login = async (req, res) => {
   try {
     const { email, password, role } = req.body;
 
     if (!email || !password) {
       return res.status(400).json({
         status: 'fail',
-        message: 'Please provide email and password'
+        message: 'Please provide email and password',
       });
     }
 
@@ -131,14 +134,14 @@ exports.login = async (req, res) => {
       default:
         return res.status(400).json({
           status: 'fail',
-          message: 'Invalid role'
+          message: 'Invalid role',
         });
     }
 
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({
         status: 'fail',
-        message: 'Incorrect email or password'
+        message: 'Incorrect email or password',
       });
     }
 
@@ -146,12 +149,12 @@ exports.login = async (req, res) => {
 
     res.status(200).json({
       status: 'success',
-      token
+      token,
     });
   } catch (err) {
     res.status(400).json({
       status: 'fail',
-      message: err.message
+      message: err.message,
     });
   }
 };
