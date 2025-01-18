@@ -19,7 +19,7 @@ const patientSchema = new mongoose.Schema({
     minlength: 8,
     select: false
   },
-  dateOfBirth: {
+  dateOfBirth: { 
     type: Date,
     required: [true, 'Date of birth is required']
   },
