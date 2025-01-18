@@ -4,24 +4,16 @@ import prescriptionController from '../controllers/prescriptionController.js';
 
 const router = express.Router();
 
+// Apply authentication middleware to all routes
 router.use(protect);
 
-router.post(
-  '/',
-  restrictTo('doctor'),
-  prescriptionController.createPrescription
-);
+// Create prescription - doctors only
 
-router.get(
-  '/:id',
-  restrictTo('patient'),
-  prescriptionController.viewPrescription
-);
-
-router.patch(
-  '/:id',
-  restrictTo('pharmacist'),
-  prescriptionController.updatePrescription
-);
+router.post('/', restrictTo('doctor'), prescriptionController.createPrescription);
+router.get('/searchPatient', restrictTo('patient'), prescriptionController.getPrescriptionsForPatient);
+router.get('/id/:id', restrictTo('doctor', 'pharmacist', 'patient'), prescriptionController.viewPrescription);
+router.patch('/id/:id', restrictTo('pharmacist'), prescriptionController.updatePrescription);
+router.get('/searchDoctor',restrictTo('doctor'),prescriptionController.getPrescriptionsForDoctor);
+router.get('/searchPharmacist',restrictTo('pharmacist'),prescriptionController.getAllPrescriptions);
 
 export default router;
