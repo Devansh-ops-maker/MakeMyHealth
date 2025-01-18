@@ -1,25 +1,28 @@
-import User from '../models/user.js';
+import Patient from '../models/patient.js'; // Adjust the path based on your project structure
 
-export const getProfile = async (req, res) => {
+export async function getProfileByName(req, res) {
   try {
-    res.json({ user: req.user.profile });
+    const name = req.user.name; // Assuming `req.user` contains the logged-in user's information
+
+    if (!name) {
+      res.status(400).json({ error: 'Patient name is required.' });
+      return;
+    }
+
+    // Find the patient by name
+    const patient = await Patient.findOne({ name });
+
+    if (!patient) {
+      res.status(404).json({ error: 'Patient not found.' });
+      return;
+    }
+
+    res.status(200).json({ success: true, patient });
   } catch (error) {
-    res.status(400).json({ message: error.message });
+    console.error('Error fetching patient profile:', error);
+    res.status(500).json({ error: 'Internal server error.' });
   }
 };
-
-export const updateProfile = async (req, res) => {
-  try {
-    const { name, phoneNumber, address } = req.body;
-    
-    const user = await User.findByIdAndUpdate(
-      req.user._id,
-      { name, phoneNumber, address },
-      { new: true, runValidators: true }
-    );
-
-    res.json({ user: user.profile });
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
+export default {
+  getProfileByName
 };
