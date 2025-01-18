@@ -4,8 +4,21 @@ const prescriptionSchema = new mongoose.Schema({
   prescriptionId: {
     type: String,
     unique: true,
+    
     default: () => Math.random().toString(36).substring(2, 8).toUpperCase()
   },
+    doctorName: {
+      type: String,
+      required: true
+    },
+    doctorEmail: {
+      type: String,
+      required: true
+    },
+    doctorPhoneNumber: {
+      type: Number,
+      required: true
+    },
   hospitalName: {
     type: String,
     required: true
