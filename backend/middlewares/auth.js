@@ -1,12 +1,18 @@
 import jwt from "jsonwebtoken";
-import * as Doctor from '../models/doctor.js';
-import * as Patient from '../models/patient.js';
-import * as Pharmacist from '../models/Pharmacist.js';
-import * as Prescription from '../models/prescription.js';
+import Doctor from '../models/doctor.js';
+import Patient from '../models/patient.js';
+import Pharmacist from '../models/pharmacist.js';
 
 export const protect = async (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
+    // Get token and check if it exists
+    let token;
+    
+    // Only try to split if authorization header exists
+    if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+      token = req.headers.authorization.split(' ')[1];
+    }
+
     if (!token) {
       return res.status(401).json({
         status: 'fail',
@@ -14,29 +20,41 @@ export const protect = async (req, res, next) => {
       });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // Token verification
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    let user;
-    if (decoded.role === 'doctor') {
-      user = await Doctor.findById(decoded.id);
-    } else if (decoded.role === 'patient') {
-      user = await Patient.findById(decoded.id);
-    } else if (decoded.role === 'pharmacist') {
-      user = await Pharmacist.findById(decoded.id);
-    }
+      // Fetch user based on role in the token
+      let user;
+      if (decoded.role === 'doctor') {
+        user = await Doctor.findById(decoded.id);
+      } else if (decoded.role === 'patient') {
+        user = await Patient.findById(decoded.id);
+      } else if (decoded.role === 'pharmacist') {
+        user = await Pharmacist.findById(decoded.id);
+      }
 
-    if (!user) {
+      if (!user) {
+        return res.status(401).json({
+          status: 'fail',
+          message: 'The user belonging to this token no longer exists.',
+        });
+      }
+
+      // Everything ok, attach user to request
+      req.user = user;
+      req.userRole = decoded.role;
+      next();
+      
+    } catch (err) {
       return res.status(401).json({
         status: 'fail',
-        message: 'The user belonging to this token no longer exists.',
+        message: 'Invalid token. Please log in again.',
       });
     }
-
-    req.user = user;
-    req.userRole = decoded.role;
-    next();
   } catch (err) {
-    res.status(401).json({
+    console.error('JWT verification failed:', err);
+    return res.status(401).json({
       status: 'fail',
       message: 'Invalid or expired token. Please log in again.',
     });
