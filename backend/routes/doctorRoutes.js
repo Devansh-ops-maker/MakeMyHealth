@@ -1,21 +1,11 @@
-const express = require('express');
+import express from 'express';
+import { protect, restrictTo } from '../middlewares/auth.js';
+import doctorController from '../controllers/doctorController.js';
+
 const router = express.Router();
-const { authenticateUser, authorizeRole } = require('../middleware/auth');
-const {
-  createDoctor,
-  getAllDoctors,
-  getDoctorById,
-  updateDoctor,
-  deleteDoctor
-} = require('../controllers/doctorController');
 
-// Public routes
-router.get('/', getAllDoctors);
-router.get('/:id', getDoctorById);
+router.use(protect);
 
-// Protected routes
-router.post('/', authenticateUser, authorizeRole(['admin']), createDoctor);
-router.put('/:id', authenticateUser, authorizeRole(['admin', 'doctor']), updateDoctor);
-router.delete('/:id', authenticateUser, authorizeRole(['admin']), deleteDoctor);
+router.get('/',restrictTo('doctor'),doctorController.getProfileByName);
 
-module.exports = router;
+export default router;
