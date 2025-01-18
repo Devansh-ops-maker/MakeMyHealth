@@ -1,11 +1,14 @@
 import jwt from 'jsonwebtoken';
 import  Doctor from '../models/doctor.js';
 import  Patient from '../models/patient.js';
-import  Pharmacist from '../models/Pharmacist.js';
+import  Pharmacist from '../models/pharmacist.js';
 import  Prescription from '../models/prescription.js';
 
-const signToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, {
+process.env.JWT_SECRET = '65ed2a1a80f1c527e4f91badfbe8ba1ed1893461326dae1d45e0614b4aeacdba53928b1cde0bb59e9ec2ac1d10f5fda637eedfe817fed877abad57b8fd39db01';
+process.env.JWT_EXPIRES_IN = '24h';
+
+const signToken = (id, role) => {
+  return jwt.sign({ id, role }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   });
 };
@@ -29,7 +32,7 @@ export const registerDoctor = async (req, res) => {
       createdAt: req.body.createdAt,
     });
 
-    const token = signToken(newDoctor._id);
+    const token = signToken(newDoctor._id, 'doctor');
 
     res.status(201).json({
       status: 'success',
@@ -61,7 +64,7 @@ export const registerPatient = async (req, res) => {
       emergencyContact: req.body.emergencyContact,
     });
 
-    const token = signToken(newPatient._id);
+    const token = signToken(newPatient._id, 'patient');
 
     res.status(201).json({
       status: 'success',
@@ -92,7 +95,7 @@ export const registerPharmacist = async (req, res) => {
       createdAt: req.body.createdAt,
     });
 
-    const token = signToken(newPharmacist._id);
+    const token = signToken(newPharmacist._id, 'pharmacist');
 
     res.status(201).json({
       status: 'success',
@@ -145,7 +148,7 @@ export const login = async (req, res) => {
       });
     }
 
-    const token = signToken(user._id);
+    const token = signToken(user._id, role);
 
     res.status(200).json({
       status: 'success',
