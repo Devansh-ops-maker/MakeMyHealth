@@ -8,4 +8,5 @@ router.post('/register/patient', authController.registerPatient);
 router.post('/register/pharmacist', authController.registerPharmacist);
 router.post('/login', authController.login);
 
+
 export default router;
